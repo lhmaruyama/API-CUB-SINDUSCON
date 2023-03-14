@@ -62,20 +62,36 @@ app.get("/R1-A", (req: any, res: any) => {
 })
 
 app.get("/byref", (req: any, res: any) => {
-    const { id } = req.body
-    console.log(id)
+    const { reference, standard } = req.body
+/*     console.log(id) */
     connection.query(
         `SELECT *
-        FROM \`api-cub\`.reference
-        LEFT JOIN \`R1-A\` ON reference.id = \`R1-A\`.reference_id
-        LEFT JOIN \`R1-N\` ON \`R1-A\`.reference_id = \`R1-N\`.reference_id
-        LEFT JOIN \`R1-B\` ON \`R1-N\`.reference_id = \`R1-B\`.reference_id
-        WHERE reference.id = ?`,
-        [id],
+        FROM \`api-cub\`.\`${standard}\`
+        WHERE reference_id = ?`,
+        [reference],
         (error, results, fields) => {
             connection.end()
             if (error) { return res.status(400).json(error) }
-            return res.status(200).json({ message: "Tabela R1-A", results })
+            return res.status(200).json({ message: "Dados", results })
+        }
+    )
+})
+
+app.get("/join", (req: any, res: any) => {
+    const { reference } = req.body
+/*     console.log(id) */
+    connection.query(
+        `SELECT *
+        FROM \`api-cub.R1-A\`
+        INNER JOIN \`api-cub\`.\`R1-B\`
+        ON  \`api-cub\`.\`R1-A\`.reference_id = \`api-cub\`.\`R1-B\`.reference_id
+        WHERE \`api-cub\`.\`R1-A\`.reference_id =?`,
+        [reference],
+        (error, results, fields) => {
+            connection.end()
+            if (error) { return res.status(400).json(error) }
+            /* return res.status(200).json({ message: "Dados", results }) */
+            return res.send(results)
         }
     )
 })
