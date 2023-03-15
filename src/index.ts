@@ -82,10 +82,30 @@ app.get("/join", (req: any, res: any) => {
 /*     console.log(id) */
     connection.query(
         `SELECT *
-        FROM \`api-cub.R1-A\`
+        FROM \`api-cub\`.\`R1-A\`
         INNER JOIN \`api-cub\`.\`R1-B\`
-        ON  \`api-cub\`.\`R1-A\`.reference_id = \`api-cub\`.\`R1-B\`.reference_id
+        ON \`api-cub\`.\`R1-A\`.reference_id = \`api-cub\`.\`R1-B\`.reference_id
         WHERE \`api-cub\`.\`R1-A\`.reference_id =?`,
+        [reference],
+        (error, results, fields) => {
+            connection.end()
+            if (error) { return res.status(400).json(error) }
+            /* return res.status(200).json({ message: "Dados", results }) */
+            return res.send(results)
+        }
+    )
+})
+//a biblioteca mysql ao realizar consulta com inner join não considera colunas com nome iguais presentes em tabelas
+
+app.get("/excel", (req: any, res: any) => {
+    const { reference } = req.body
+/*     console.log(id) */
+    connection.query(
+        `SELECT *
+        FROM excel.table1
+        INNER JOIN excel.table2
+        ON excel.table1.id_client = excel.table2.id_client
+        WHERE excel.table1.id_client =?`,
         [reference],
         (error, results, fields) => {
             connection.end()
