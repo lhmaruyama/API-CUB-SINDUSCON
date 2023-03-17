@@ -115,6 +115,24 @@ app.get("/excel", (req: any, res: any) => {
         }
     )
 })
+app.get("/excel", (req: any, res: any) => {
+    const { reference } = req.body
+/*     console.log(id) */
+    connection.query(
+        `SELECT *
+        FROM excel.table1
+        INNER JOIN excel.table2
+        ON excel.table1.id_client = excel.table2.id_client
+        WHERE excel.table1.id_client =?`,
+        [reference],
+        (error, results, fields) => {
+            connection.end()
+            if (error) { return res.status(400).json(error) }
+            /* return res.status(200).json({ message: "Dados", results }) */
+            return res.send(results)
+        }
+    )
+})
 
 /* app.get("/", (req: any, res: any) => {
     const { name, idade } = req.body
